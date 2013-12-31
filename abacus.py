@@ -35,17 +35,17 @@ def cmd_parser():
                         dest="log_level",
                         help="Setup the logging level")
 
-    args = parser.parse_args()
-    return args
+    parsed_args = parser.parse_args()
+    return parsed_args
 
 
 def gen_questions(num_operands, max_operand=100):
     """
     Generate abacus question with given number of operands
     """
-    operand = 0
+#    operand = 0
     sum = 0
-    tmp_sum = 0
+#    tmp_sum = 0
     operands = []
 
     for i in range(num_operands):
@@ -66,10 +66,10 @@ def print_operands(operands):
     Print the operands in formula format
     """
     for i in range(len(operands)):
-        if (i == 0):
+        if i == 0:
             print(operands[i], end="")
         else:
-            if (operands[i] >= 0):
+            if operands[i] >= 0:
                 print(" + ", end="")
                 print(operands[i], end="")
             else:
@@ -84,7 +84,7 @@ def repr_operands(operands):
     """
     rslt = ""
     for i in range(len(operands)):
-        if (i == 0):
+        if i == 0:
             rslt = "{0:>2}".format(operands[i])
         else:
             if operands[i] >= 0:
@@ -100,7 +100,7 @@ if __name__ == '__main__':
 
     # Setup logging level
     numeric_level = getattr(logging, args.log_level.upper(), None)
-    if (not isinstance(numeric_level, int)):
+    if not isinstance(numeric_level, int):
         raise ValueError("Invalid log level %s!" % args.log_level.upper())
 
     logging.basicConfig(level=logging.INFO, format='%(asctime)s %(message)s', filename="info.log")
@@ -129,21 +129,21 @@ if __name__ == '__main__':
 
     for i in range(num_questions):
         mark = 1
-        operands, sum = gen_questions(num_operands)
+        operands, rslt = gen_questions(num_operands)
         correct = False
         while not correct:
             ans = input(repr_operands(operands))
-            if (ans.isdecimal()):
-                if (int(ans) == sum):
+            if ans.isdecimal():
+                if int(ans) == rslt:
                     correct = True
                 else:
                     errDict[i+1] += 1
                     log_fhd.write(repr_operands(operands))
                     log_fhd.write(ans.strip())
-                    log_fhd.write("\t" + "[{0:>2d}]".format(sum))
+                    log_fhd.write("\t" + "[{0:>2d}]".format(rslt))
                     log_fhd.write("\n")
                     mark = 0
-                    if (not_repeat):
+                    if not_repeat:
                         correct = True
                     else:
                         print("The answer is wrong, try again")
