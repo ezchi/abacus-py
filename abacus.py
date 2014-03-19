@@ -16,6 +16,7 @@ def cmd_parser():
                              help="List of tables for practice")
     parser_mult.add_argument("-r, --random",
                              dest="do_random",
+                             action="store_true",
                              help="Randomize the sequence in times \
                              table")
     # parser.add_argument("--questions",
