@@ -19,22 +19,24 @@ def cmd_parser():
                              action="store_true",
                              help="Randomize the sequence in times \
                              table")
-    # parser.add_argument("--questions",
-    #                     type=int,
-    #                     dest="questions",
-    #                     default=30,
-    #                     help="Number of questions")
-    # parser.add_argument("--operands",
-    #                     type=int,
-    #                     dest="operands",
-    #                     default=5,
-    #                     help="Number of operands")
-    # parser.add_argument("--repeat",
-    #                     action="store_true",
-    #                     default=False,
-    #                     dest="repeat",
-    #                     help="Repeat the question with wrong answer \
-    #                    until get it right")
+    parser_plus = subparsers.add_parser("plus",
+                                        help="Plus and Minus")
+    parser_plus.add_argument("--questions",
+                             type=int,
+                             dest="questions",
+                             default=30,
+                             help="Number of questions")
+    parser_plus.add_argument("--operands",
+                             type=int,
+                             dest="operands",
+                             default=5,
+                             help="Number of operands")
+    parser_plus.add_argument("--repeat",
+                             action="store_true",
+                             default=False,
+                             dest="repeat",
+                             help="Repeat the question with wrong answer \
+                             until get it right")
     args = parser.parse_args()
     return args
 
@@ -116,13 +118,13 @@ def mult_questions(tables, do_random=False):
     """
 
     baseTable = [x for x in range(1, 13)]
-    
+
     questions = []
 
     for t in tables:
         for a in baseTable:
             questions.append((a, t))
-    
+
     if do_random:
         random.shuffle(questions)
 
@@ -138,7 +140,7 @@ def mult_questions(tables, do_random=False):
                     print("The answer is wrong, try again")
             except:
                 print("Can't understand what do you mean, try it again")
-            
+
 
 def ShowReport():
     """
@@ -157,8 +159,43 @@ def main():
         tables = generate_table(args.tables)
         mult_questions(tables, args.do_random)
     elif args.cmd == "plus":
-        pass
-    
+        num_questions = args.questions
+        not_repeat = not args.repeat
+        num_operands = args.operands
+
+        total_mark = 0
+        wrong_ans = []
+
+        log_fname = "wrong_questions.txt"
+        log_fhd   = open(log_fname, 'w')
+        
+        for i in range(num_questions):
+            mark = 1
+            operands, sum = gen_questions(num_operands)
+            correct = False
+            while not correct:
+                ans = input(repr_operands(operands))
+                if (ans.isdecimal()):
+                    if (int(ans) == sum):
+                        correct = True
+                    else:
+                        log_fhd.write(repr_operands(operands))
+                        log_fhd.write(ans.strip())
+                        log_fhd.write("\t" + "[{0:>2d}]".format(sum))
+                        log_fhd.write("\n")
+                        mark = 0
+                        if (not_repeat):
+                            correct = True
+                        else:
+                            print("The answer is wrong, try again")
+                else:
+                    print("Sorry, give me the answer please")
+                    mark = 0
+            total_mark += mark
+
+        log_fhd.close()
+
+
     endTime = datetime.datetime.now()
 
     print("Total time:", endTime - startTime)
@@ -167,48 +204,10 @@ def main():
 
 if __name__ == '__main__':
     main()
-    # args = cmd_parser()
 
-    # num_questions = args.questions
-    # not_repeat    = not args.repeat
-    # num_operands  = args.operands
-
-    # total_mark = 0
-    # wrong_ans  = []
-
-    # log_fname = "wrong_questions.txt"
-    # log_fhd   = open(log_fname, 'w')
 
     # start_time = datetime.datetime.now()
 
-    # for i in range(num_questions):
-    #     mark = 1
-    #     operands, sum = gen_questions(num_operands)
-    #     correct = False
-    #     while not correct:
-    #         ans = input(repr_operands(operands))
-    #         if (ans.isdecimal()):
-    #             if (int(ans) == sum):
-    #                 correct = True
-    #             else:
-    #                 log_fhd.write(repr_operands(operands))
-    #                 log_fhd.write(ans.strip())
-    #                 log_fhd.write("\t" + "[{0:>2d}]".format(sum))
-    #                 log_fhd.write("\n")
-    #                 mark = 0
-    #                 if (not_repeat):
-    #                     correct = True
-    #                 else:
-    #                     print("The answer is wrong, try again")
-    #         else:
-    #             print("Sorry, give me the answer please")
-    #             mark = 0
-    #         total_mark += mark
-
-    # end_time = datetime.datetime.now()
-
-    # delta_time = end_time - start_time
-    # log_fhd.close()
 
     # print("Time       : %s" % delta_time)
     # print("Total Mark : {0:>2.2f}%".format(total_mark/num_questions * 100))
