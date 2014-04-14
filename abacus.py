@@ -84,17 +84,17 @@ def repr_operands(operands):
     """
     Covert the operands to formula format
     """
-    rslt = ""
+    rslt = []
     for i in range(len(operands)):
         if (i == 0):
-            rslt = "{0:>2}".format(operands[i])
+            rslt.append("{0:>2}".format(operands[i]))
         else:
             if (operands[i] >= 0):
-                rslt += " + {0:>2}".format(operands[i])
+                rslt.append("+ {0:>2}".format(operands[i]))
             else:
-                rslt += " - {0:>2}".format(-operands[i])
-    rslt += " = "
-    return rslt
+                rslt.append("- {0:>2}".format(-operands[i]))
+    rslt.append("= ")
+    return " ".join(rslt)
 
 
 def generate_table(strTable):
