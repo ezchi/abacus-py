@@ -114,18 +114,37 @@ def mult_questions(tables, do_random=False):
     """
     Generate questions for multiple
     """
+
     baseTable = [x for x in range(1, 13)]
+    
+    questions = []
+
     for t in tables:
-        if do_random:
-            random.shuffle(baseTable)
-        for b in baseTable:
-            correct = False
-            while not correct:
-                ans = input("{} x {} = ".format(b, t))
-                if int(ans) == b * t:
+        for a in baseTable:
+            questions.append((a, t))
+    
+    if do_random:
+        random.shuffle(questions)
+
+    for a, b in questions:
+        correct = False
+        while not correct:
+            ans = input("{} x {} = ".format(a, b))
+            try:
+                iAns = int(ans)
+                if (iAns == a * b):
                     correct = True
                 else:
-                    print("The asnwer is wrong, try again")
+                    print("The answer is wrong, try again")
+            except:
+                print("Can't understand what do you mean, try it again")
+            
+
+def ShowReport():
+    """
+    Display report
+    """
+    pass
 
 
 def main():
@@ -133,10 +152,17 @@ def main():
     Main function
     """
     args = cmd_parser()
+    startTime = datetime.datetime.now()
     if args.cmd == "mult":
         tables = generate_table(args.tables)
-    mult_questions(tables, args.do_random)
-#    print(tables)
+        mult_questions(tables, args.do_random)
+    elif args.cmd == "plus":
+        pass
+    
+    endTime = datetime.datetime.now()
+
+    print("Total time:", endTime - startTime)
+    ShowReport()
 
 
 if __name__ == '__main__':
