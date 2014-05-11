@@ -14,24 +14,24 @@ def cmd_parser():
     parser_mult.add_argument("tables",
                              nargs="+",
                              help="List of tables for practice")
-    parser_mult.add_argument("-r, --random",
+    parser_mult.add_argument("-r", "--random",
                              dest="do_random",
                              action="store_true",
                              help="Randomize the sequence in times \
                              table")
     parser_plus = subparsers.add_parser("plus",
                                         help="Plus and Minus")
-    parser_plus.add_argument("--questions",
+    parser_plus.add_argument("-q", "--questions",
                              type=int,
                              dest="questions",
                              default=30,
                              help="Number of questions")
-    parser_plus.add_argument("--operands",
+    parser_plus.add_argument("-o", "--operands",
                              type=int,
                              dest="operands",
                              default=5,
                              help="Number of operands")
-    parser_plus.add_argument("--repeat",
+    parser_plus.add_argument("-r", "--repeat",
                              action="store_true",
                              default=False,
                              dest="repeat",
@@ -148,6 +148,73 @@ def ShowReport():
     """
     pass
 
+
+def gen_plus_minus_questions(numQuestions, numOperands, doRepeat):
+    """
+    Generate the given number of questions.
+    """
+    numRightAnswer = 0
+    numWrongAnswer = 0
+    wrongQuestions = []
+    for i in range(numQuestions):
+        operands, sum = gen_questions(numOperands)
+        isCorrect = False
+        while not isCorrect:
+            ans = input(repr_operands(operands))
+            if (ans.isdecimal()):
+                if (int(ans) == sum):
+                    isCorrect = True
+                    numRightAnswer += 1
+                else:
+                    numWrongAnswer += 1
+                    wrongQuestions.append((operands, sum))
+                    if (doRepeat):
+                        isCorrect = False
+                        print("The answer is wrong, try again")
+                    else:
+                        isCorrect = True
+                else:
+                    print("Sorry, give me the answer please")
+
+
+def plus_cmd(args):
+    """
+    Work out the questions for plus and minus.
+    """
+    num_questions = args.questions
+    not_repeat = not args.repeat
+    num_operands = args.operands
+    
+    total_mark = 0
+    wrong_ans = []
+
+    # log_fname = "wrong_questions.txt"
+    # log_fhd   = open(log_fname, 'w')
+        
+        for i in range(num_questions):
+            mark = 1
+            operands, sum = gen_questions(num_operands)
+            correct = False
+            while not correct:
+                ans = input(repr_operands(operands))
+                if (ans.isdecimal()):
+                    if (int(ans) == sum):
+                        correct = True
+                    else:
+                        log_fhd.write(repr_operands(operands))
+                        log_fhd.write(ans.strip())
+                        log_fhd.write("\t" + "[{0:>2d}]".format(sum))
+                        log_fhd.write("\n")
+                        mark = 0
+                        if (not_repeat):
+                            correct = True
+                        else:
+                            print("The answer is wrong, try again")
+                else:
+                    print("Sorry, give me the answer please")
+                    mark = 0
+            total_mark += mark
+    
 
 def main():
     """
