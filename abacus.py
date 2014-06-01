@@ -4,8 +4,7 @@ import logging
 import random
 import datetime
 import argparse
-
-FILE_NAME = "abacus"
+import sys
 
 def cmd_parser():
     parser = argparse.ArgumentParser()
@@ -40,9 +39,13 @@ def cmd_parser():
                              help="Repeat the question with wrong answer \
                              until get it right")
     args = parser.parse_args()
+
+    if args.cmd is None:
+        parser.print_help()
+        sys.exit()
     return args
 
-    
+
 def gen_questions(num_operands, max_operand=100):
     """
     Generate abacus question with given number of operands
@@ -111,6 +114,10 @@ def generate_table(strTable):
         else:
             timesTable.append(int(t))
 
+    if [x for x in timesTable if x > 12] or [x for x in timesTable if x < 1]:
+        log = logging.getLogger(__name__)
+        log.error("Found Illegel Table {}".format(timesTable))
+        raise ValueError("Found Illegal Table {}".format(timesTable))
     return timesTable
 
 
@@ -118,6 +125,7 @@ def mult_questions(tables, do_random=False):
     """
     Generate questions for multiple
     """
+    log = logging.getLogger(__name__)
 
     baseTable = [x for x in range(1, 13)]
 
@@ -127,16 +135,20 @@ def mult_questions(tables, do_random=False):
         for a in baseTable:
             questions.append((a, t))
 
+    log.debug("Questions before random : {}".format(questions))
+
     if do_random:
         random.shuffle(questions)
+    log.debug("Questions after random : {}".format(questions))
 
     for a, b in questions:
         correct = False
         while not correct:
-            ans = input("{} x {} = ".format(a, b))
+            log.debug("{} x {} = ".format(a, b))
+            ans = input("{} x {} = ({})".format(a, b, a*b))
+            log.debug("Answer = {}".format(ans))
             try:
-                iAns = int(ans)
-                if (iAns == a * b):
+                if (int(ans) == a * b):
                     correct = True
                 else:
                     print("The answer is wrong, try again")
@@ -148,7 +160,8 @@ def ShowReport():
     """
     Display report
     """
-    pass
+    log = logging.getLogger(__name__)
+    log.warning("ShowReport function is not implemented yet")
 
 
 def main():
@@ -156,7 +169,18 @@ def main():
     Main function
     """
     args = cmd_parser()
+
+    # Logging Configuration
+    FORMAT = '%(asctime)s - %(levelname)-8s - %(message)s'
+    #    logging.basicConfig(format=FORMAT, level=logging.INFO, filename="abacus.log")
+    logging.basicConfig(format=FORMAT, level=logging.DEBUG, filename="abacus.log")
+    log = logging.getLogger(__name__)
+
     startTime = datetime.datetime.now()
+    log.info("Start Time: {}".format(startTime))
+
+    log.debug("Command = {}".format(args.cmd))
+
     if args.cmd == "mult":
         tables = generate_table(args.tables)
         mult_questions(tables, args.do_random)
@@ -170,7 +194,7 @@ def main():
 
         log_fname = "wrong_questions.txt"
         log_fhd   = open(log_fname, 'w')
-        
+
         for i in range(num_questions):
             mark = 1
             operands, sum = gen_questions(num_operands)
@@ -197,8 +221,10 @@ def main():
 
         log_fhd.close()
 
-
     endTime = datetime.datetime.now()
+
+    log.info("End   Time: {}".format(endTime))
+    log.info("Total Time: {}".format(endTime - startTime))
 
     print("Total time:", endTime - startTime)
     ShowReport()
@@ -206,12 +232,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-
-
-    # start_time = datetime.datetime.now()
-
-
-    # print("Time       : %s" % delta_time)
-    # print("Total Mark : {0:>2.2f}%".format(total_mark/num_questions * 100))
-
-    #input()
