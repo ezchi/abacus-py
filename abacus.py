@@ -144,8 +144,8 @@ def mult_questions(tables, do_random=False):
     for a, b in questions:
         correct = False
         while not correct:
-            log.debug("{} x {} = ".format(a, b))
-            ans = input("{} x {} = ({})".format(a, b, a*b))
+            log.debug("{} x {} = ({})".format(a, b, a*b))
+            ans = input("{} x {} = ".format(a, b))
             log.debug("Answer = {}".format(ans))
             try:
                 if (int(ans) == a * b):
@@ -171,7 +171,7 @@ def main():
     args = cmd_parser()
 
     # Logging Configuration
-    FORMAT = '%(asctime)s - %(levelname)-8s - %(message)s'
+    FORMAT = '%(asctime)s - %(name)s - %(levelname)-8s - %(message)s'
     #    logging.basicConfig(format=FORMAT, level=logging.INFO, filename="abacus.log")
     logging.basicConfig(format=FORMAT, level=logging.DEBUG, filename="abacus.log")
     log = logging.getLogger(__name__)
