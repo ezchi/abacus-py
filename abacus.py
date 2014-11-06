@@ -9,16 +9,33 @@ def cmd_parser():
     parser = argparse.ArgumentParser()
     subparsers = parser.add_subparsers(dest="cmd")
 
+    parser_times_table = subparsers.add_parser("timestable",
+                                               help="Times table")
+    parser_times_table.add_argument("tables",
+                                    nargs="+",
+                                    help="List of tables for practice")
+    parser_times_table.add_argument("-r, --random",
+                                    dest="do_random",
+                                    action="store_true",
+                                    help="Randomize the sequence in times \
+                                    table")
+
     parser_mult = subparsers.add_parser("mult",
-                                        help="Times table")
-    parser_mult.add_argument("tables",
+                                        help="Multiple questions")
+    parser_mult.add_argument("maxVal",
                              nargs="+",
-                             help="List of tables for practice")
-    parser_mult.add_argument("-r, --random",
-                             dest="do_random",
-                             action="store_true",
-                             help="Randomize the sequence in times \
-                             table")
+                             type=int,
+                             help="Maxium value of arguments")
+    parser_mult.add_argument("--questions",
+                             type=int,
+                             dest="questions",
+                             default=30,
+                             help="Number of questions")
+    parser_mult.add_argument("--operands",
+                             type=int,
+                             dest="operands",
+                             default=2,
+                             help="Number of operands")
     parser_plus = subparsers.add_parser("plus",
                                         help="Plus and Minus")
     parser_plus.add_argument("--questions",
@@ -112,7 +129,7 @@ def generate_table(strTable):
     return timesTable
 
 
-def mult_questions(tables, do_random=False):
+def timestable_questions(tables, do_random=False):
     """
     Generate questions for multiple
     """
@@ -149,26 +166,81 @@ def ShowReport():
     pass
 
 
+def genMultQuestions(max_vals, numQuestions=10, numOperands=2):
+    """
+    Generate multiple questions.
+    """
+    questions = []
+    maxVal = 10
+
+    shiftCnt = 0
+    
+    for q in range(numQuestions):
+        multOps = {"ops": [],
+                   "rslt": 1}
+        rslt = 1
+        for i in range(numOperands):
+            if max_vals[i]:
+                maxVal = max_vals[i]
+            else:
+                maxVal = 10
+            operand = random.randint(1, maxVal-1)
+            rslt *= operand
+            multOps["ops"].append(operand)
+        multOps["rslt"] = rslt
+        questions.append(multOps)
+        shiftCnt += 1
+        if shiftCnt == numQuestions / numOperands:
+            shiftCnt = 0
+            max_vals = max_vals[1:] + max_vals[:1]
+
+    return questions
+
+
+def doMultQuestions(questions):
+    numWrongAnswer = 0
+    for question in questions:
+        operands = [str(x) for x in question["ops"]]
+        isCorrect = False
+        while not isCorrect:
+            ans = input("{} = ".format(" * ".join(operands)))
+            if ans.isdecimal():
+                if int(ans) == question["rslt"]:
+                    isCorrect = True
+                    
+            if not isCorrect:
+                numWrongAnswer += 1
+                print("The answer is wrong, try again")
+    return numWrongAnswer
+
+
 def main():
     """
     Main function
     """
     args = cmd_parser()
+
     startTime = datetime.datetime.now()
-    if args.cmd == "mult":
+
+    numWrongAnswer = 0
+    numQuestions = args.questions
+    
+    # Execute Commands
+    if args.cmd == "timestable":
         tables = generate_table(args.tables)
-        mult_questions(tables, args.do_random)
+        numQuestions = len(tables) * 12
+        timestable_questions(tables, args.do_random)
     elif args.cmd == "plus":
         num_questions = args.questions
         not_repeat = not args.repeat
         num_operands = args.operands
 
         total_mark = 0
-        wrong_ans = []
+        # wrong_ans = []
 
         log_fname = "wrong_questions.txt"
-        log_fhd   = open(log_fname, 'w')
-        
+        log_fhd = open(log_fname, 'w')
+
         for i in range(num_questions):
             mark = 1
             operands, sum = gen_questions(num_operands)
@@ -194,22 +266,19 @@ def main():
             total_mark += mark
 
         log_fhd.close()
-
+    elif args.cmd == "mult":
+        questions = genMultQuestions(args.maxVal,
+                                     args.questions,
+                                     args.operands)
+        numWrongAnswer = doMultQuestions(questions)
+        
 
     endTime = datetime.datetime.now()
 
+    print("Score: {} : {}".format(numQuestions, numWrongAnswer))
     print("Total time:", endTime - startTime)
     ShowReport()
 
 
 if __name__ == '__main__':
     main()
-
-
-    # start_time = datetime.datetime.now()
-
-
-    # print("Time       : %s" % delta_time)
-    # print("Total Mark : {0:>2.2f}%".format(total_mark/num_questions * 100))
-
-    #input()
