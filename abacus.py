@@ -222,7 +222,9 @@ def main():
     startTime = datetime.datetime.now()
 
     numWrongAnswer = 0
-    numQuestions = args.questions
+
+    if args.cmd != "timestable":
+        numQuestions = args.questions
 
     # Execute Commands
     if args.cmd == "timestable":
