@@ -48,12 +48,6 @@ def cmd_parser():
                              dest="operands",
                              default=5,
                              help="Number of operands")
-    parser_plus.add_argument("--repeat",
-                             action="store_true",
-                             default=False,
-                             dest="repeat",
-                             help="Repeat the question with wrong answer \
-                             until get it right")
     args = parser.parse_args()
     return args
 
@@ -65,19 +59,20 @@ def gen_questions(num_operands, max_operand=100):
     operand = 0
     sum = 0
     tmp_sum = 0
-    operands = []
+    questions = {"operands": [],
+                 "result": []}
 
     for i in range(num_operands):
-        get_operand = False
-        while (not get_operand):
-            operand = random.randint(-sum, max_operand-1)
+        operandGet = False
+        while (not operandGet):
+            operand = random.randint(-max_operand+1, max_operand-1)
             tmp_sum = sum + operand
-            if tmp_sum in range(max_operand):
-                get_operand = True
-                operands.append(operand)
+            if tmp_sum >= 0:
+                operandGet = True
+                questions["operands"].append(operand)
                 sum = tmp_sum
-
-    return operands, sum
+    questions["result"] = sum
+    return questions
 
 
 def print_operands(operands):
@@ -232,46 +227,25 @@ def main():
         timestable_questions(tables, args.do_random)
     elif args.cmd == "plus":
         num_questions = args.questions
-        not_repeat = not args.repeat
         num_operands = args.operands
 
-        total_mark = 0
-        # wrong_ans = []
-
-        log_fname = "wrong_questions.txt"
-        log_fhd = open(log_fname, 'w')
-
         for i in range(num_questions):
-            mark = 1
-            operands, sum = gen_questions(num_operands)
+            questions = gen_questions(num_operands)
             correct = False
             while not correct:
-                ans = input(repr_operands(operands))
+                ans = input(repr_operands(questions["operands"]))
                 if (ans.isdecimal()):
-                    if (int(ans) == sum):
+                    if (int(ans) == questions["result"]):
                         correct = True
-                    else:
-                        log_fhd.write(repr_operands(operands))
-                        log_fhd.write(ans.strip())
-                        log_fhd.write("\t" + "[{0:>2d}]".format(sum))
-                        log_fhd.write("\n")
-                        mark = 0
-                        if (not_repeat):
-                            correct = True
-                        else:
-                            print("The answer is wrong, try again")
-                else:
-                    print("Sorry, give me the answer please")
-                    mark = 0
-            total_mark += mark
+                if (not correct):
+                    numWrongAnswer += 1
+                    print("The answer is wrong, try again")
 
-        log_fhd.close()
     elif args.cmd == "mult":
         questions = genMultQuestions(args.maxVal,
                                      args.questions,
                                      args.operands)
         numWrongAnswer = doMultQuestions(questions)
-        
 
     endTime = datetime.datetime.now()
 
