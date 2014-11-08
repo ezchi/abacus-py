@@ -169,7 +169,11 @@ def genMultQuestions(max_vals, numQuestions=10, numOperands=2):
     maxVal = 10
 
     shiftCnt = 0
-    
+
+    # Set default value to missing maximum operand value
+    for i in range(numOperands - len(max_vals)):
+        max_vals.append(maxVal)
+
     for q in range(numQuestions):
         multOps = {"ops": [],
                    "rslt": 1}
@@ -202,7 +206,7 @@ def doMultQuestions(questions):
             if ans.isdecimal():
                 if int(ans) == question["rslt"]:
                     isCorrect = True
-                    
+
             if not isCorrect:
                 numWrongAnswer += 1
                 print("The answer is wrong, try again")
@@ -219,7 +223,7 @@ def main():
 
     numWrongAnswer = 0
     numQuestions = args.questions
-    
+
     # Execute Commands
     if args.cmd == "timestable":
         tables = generate_table(args.tables)
