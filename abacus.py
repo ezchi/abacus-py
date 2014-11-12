@@ -3,7 +3,7 @@
 import random
 import datetime
 import argparse
-
+import math
 
 def cmd_parser():
     parser = argparse.ArgumentParser()
@@ -167,7 +167,7 @@ def genMultQuestions(max_vals, numQuestions=10, numOperands=2):
     """
     questions = []
     maxVal = 10
-
+    minVal = 2
     shiftCnt = 0
 
     # Set default value to missing maximum operand value
@@ -183,7 +183,10 @@ def genMultQuestions(max_vals, numQuestions=10, numOperands=2):
                 maxVal = max_vals[i]
             else:
                 maxVal = 10
-            operand = random.randint(1, maxVal-1)
+            minVal = (int(math.log10(maxVal)) - 1) * 10
+            if minVal < 2:
+                minVal = 2;
+            operand = random.randint(minVal, maxVal-1)
             rslt *= operand
             multOps["ops"].append(operand)
         multOps["rslt"] = rslt
