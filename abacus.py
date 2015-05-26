@@ -5,6 +5,7 @@ import datetime
 import argparse
 import math
 
+
 def cmd_parser():
     parser = argparse.ArgumentParser()
     subparsers = parser.add_subparsers(dest="cmd")
@@ -48,6 +49,23 @@ def cmd_parser():
                              dest="operands",
                              default=5,
                              help="Number of operands")
+
+    parser_div = subparsers.add_parser("div",
+                                       help="Division Questions")
+    parser_div.add_argument("max_val",
+                            nargs=1,
+                            type=int,
+                            help="Maxium value of arguments")
+    parser_div.add_argument("min_val",
+                            nargs=1,
+                            type=int,
+                            help="minumium value of arguments")
+    parser_div.add_argument("--questions",
+                            type=int,
+                            dest="questions",
+                            default=30,
+                            help="Number of questions")
+    
     args = parser.parse_args()
     return args
 
@@ -216,6 +234,50 @@ def doMultQuestions(questions):
     return numWrongAnswer
 
 
+def gen_div_questions(max_val, min_val, num_of_questions=10):
+    """
+    Generate division questions.
+    """
+    questions = []
+
+    for q in range(num_of_questions):
+        dividend = random.randint(min_val, max_val-1)
+        divisor = random.randint(2, 9)
+        questions.append({"dividend": dividend,
+                          "divisor": divisor,
+                          "result": dividend // divisor,
+                          "reminder": dividend % divisor})
+    return questions
+
+
+def do_div_questions(questions):
+    numWrongAnswer = 0
+    for question in questions:
+        correct = False
+        while not correct:
+            result = None
+            reminder = 0
+            ans = input("{} {} {} = ".format(question["dividend"],
+                                             chr(0xf7),
+                                             question["divisor"]))
+            ans = ans.strip().split()
+
+            if len(ans) > 0:
+                result = int(ans[0])
+
+            if len(ans) == 2:
+                reminder = int(ans[1])
+
+            if ((result == question["result"]) and
+                (reminder == question["reminder"])):
+                correct = True
+
+            if not correct:
+                numWrongAnswer += 1
+                print("The answer is wrong, try again")
+    return numWrongAnswer
+
+
 def main():
     """
     Main function
@@ -256,6 +318,12 @@ def main():
                                      args.operands)
         numWrongAnswer = doMultQuestions(questions)
 
+    elif args.cmd == "div":
+        questions = gen_div_questions(args.max_val[0],
+                                      args.min_val[0],
+                                      args.questions)
+        numWrongAnswer = do_div_questions(questions)
+        
     endTime = datetime.datetime.now()
 
     print("Score: {} : {}".format(numQuestions, numWrongAnswer))
