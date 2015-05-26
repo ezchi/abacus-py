@@ -256,17 +256,21 @@ def do_div_questions(questions):
         correct = False
         while not correct:
             result = None
-            reminder = 0
+            reminder = None
             ans = input("{} {} {} = ".format(question["dividend"],
                                              chr(0xf7),
                                              question["divisor"]))
             ans = ans.strip().split()
 
-            if len(ans) > 0:
-                result = int(ans[0])
-
-            if len(ans) == 2:
-                reminder = int(ans[1])
+            if len(ans) == 1:
+                if ans[0].isdecimal():
+                    result = int(ans[0])
+                reminder = 0
+            elif len(ans) == 2:
+                if ans[0].isdecimal():
+                    result = int(ans[0])
+                if ans[1].isdecimal():
+                    reminder = int(ans[1])
 
             if ((result == question["result"]) and
                 (reminder == question["reminder"])):
