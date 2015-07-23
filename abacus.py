@@ -65,12 +65,12 @@ def cmd_parser():
                             dest="questions",
                             default=30,
                             help="Number of questions")
-    
+
     args = parser.parse_args()
     return args
 
 
-def gen_questions(num_operands, max_operand=100):
+def gen_questions(num_operands, max_operand=1000):
     """
     Generate abacus question with given number of operands
     """
@@ -327,7 +327,7 @@ def main():
                                       args.min_val[0],
                                       args.questions)
         numWrongAnswer = do_div_questions(questions)
-        
+
     endTime = datetime.datetime.now()
 
     print("Score: {} : {}".format(numQuestions, numWrongAnswer))
