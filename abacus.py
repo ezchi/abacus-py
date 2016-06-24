@@ -25,7 +25,7 @@ def cmd_parser():
     parser_mult.add_argument("maxVal",
                              nargs="+",
                              type=int,
-                             help="Maxium value of arguments")
+                             help="Maximum value of arguments")
     parser_mult.add_argument("--questions",
                              type=int,
                              dest="questions",
