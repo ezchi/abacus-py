@@ -80,7 +80,7 @@ def gen_questions(num_operands, max_operand=1000):
     questions = {"operands": [],
                  "result": []}
 
-    for i in range(num_operands):
+    for _ in range(num_operands):
         operandGet = False
         while (not operandGet):
             operand = random.randint(-max_operand+1, max_operand-1)
@@ -192,7 +192,7 @@ def genMultQuestions(max_vals, numQuestions=10, numOperands=2):
     for i in range(numOperands - len(max_vals)):
         max_vals.append(maxVal)
 
-    for q in range(numQuestions):
+    for _ in range(numQuestions):
         multOps = {"ops": [],
                    "rslt": 1}
         rslt = 1
@@ -240,7 +240,7 @@ def gen_div_questions(max_val, min_val, num_of_questions=10):
     """
     questions = []
 
-    for q in range(num_of_questions):
+    for _ in range(num_of_questions):
         dividend = random.randint(min_val, max_val-1)
         divisor = random.randint(2, 9)
         questions.append({"dividend": dividend,
@@ -304,7 +304,7 @@ def main():
         num_questions = args.questions
         num_operands = args.operands
 
-        for i in range(num_questions):
+        for _ in range(num_questions):
             questions = gen_questions(num_operands)
             correct = False
             while not correct:
