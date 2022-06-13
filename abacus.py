@@ -147,7 +147,9 @@ def timestable_questions(tables, do_random=False):
     Generate questions for multiple
     """
 
-    baseTable = [x for x in range(1, 13)]
+    numWrongAnswer = 0
+
+    baseTable = [x for x in range(1, 10)]
 
     questions = []
 
@@ -161,6 +163,7 @@ def timestable_questions(tables, do_random=False):
     for a, b in questions:
         correct = False
         while not correct:
+            numWrongAnswer += 1
             ans = input("{} x {} = ".format(a, b))
             try:
                 iAns = int(ans)
@@ -170,7 +173,7 @@ def timestable_questions(tables, do_random=False):
                     print("The answer is wrong, try again")
             except:
                 print("Can't understand what do you mean, try it again")
-
+    return numWrongAnswer
 
 def ShowReport():
     """
@@ -298,8 +301,8 @@ def main():
     # Execute Commands
     if args.cmd == "timestable":
         tables = generate_table(args.tables)
-        numQuestions = len(tables) * 12
-        timestable_questions(tables, args.do_random)
+        numQuestions = len(tables) * 9
+        numWrongAnswer = timestable_questions(tables, args.do_random)
     elif args.cmd == "plus":
         num_questions = args.questions
         num_operands = args.operands
